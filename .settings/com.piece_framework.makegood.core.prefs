@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+phpunit_config_file=/Crawler-Rules/phpunit.xml
+preload_script=/Crawler-Rules/vendor/autoload.php
+test_file_pattern=
+test_folders=/Crawler-Rules/tests
+testing_framework=PHPUnit
