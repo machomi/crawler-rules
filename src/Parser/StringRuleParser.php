@@ -38,10 +38,8 @@ class StringRuleParser implements RuleParser
         if (!empty($rule->getPreFilters())) {
             if ($rule->getType() && !$rule->getName()) {
                 $preDefintion .= self::$TYPE_SEPARATOR;
-            } elseif ($rule->getName()) {
-                $preDefintion .= self::$NAME_SEPARATOR;
-            }
-            $preDefintion .= $this->serializeFilters($rule->getPreFilters());
+            } 
+            $preDefintion .= self::$NAME_SEPARATOR . $this->serializeFilters($rule->getPreFilters());
         }
         
         if ($preDefintion) {
@@ -75,10 +73,13 @@ class StringRuleParser implements RuleParser
             list($beforeDefinition, $afterDefinition) = explode(self::$PRE_DEFINITION_SEPERATOR, $input);
             
             // analyze before definition fragment
-            if (strpos(self::$NAME_SEPARATOR, $beforeDefinition)) {
+            // if has name separatory mean that we propably have pre filters to parse
+            if (strpos($beforeDefinition, self::$NAME_SEPARATOR)) {
                 
                 list($nameAndType, $preFilters) = explode(self::$NAME_SEPARATOR, $beforeDefinition);
-                $this->processPreFilters($rule, $preFilters);
+                if (trim($preFilters) != '') {
+                    $this->parsePreFilters($rule, $preFilters);
+                }
 
                 // check for types
                 if (strpos($nameAndType, self::$TYPE_SEPARATOR)) {
@@ -89,19 +90,12 @@ class StringRuleParser implements RuleParser
                     $rule->setName($nameAndType);
                 }
                 
-            } elseif (strpos(self::$TYPE_SEPARATOR, $beforeDefinition)) {
+            } elseif (strpos($beforeDefinition, self::$TYPE_SEPARATOR)) {
                 
-                list($nameAndType, $preFilters) = explode(self::$TYPE_SEPARATOR, $beforeDefinition);
-                $this->processPreFilters($rule, $preFilters);
-                
-                // check for types
-                if (strpos($nameAndType, self::$TYPE_SEPARATOR)) {
-                    list($type, $name) = explode(self::$TYPE_SEPARATOR, $nameAndType);
-                    $rule->setType($type);
-                    $rule->setName($name);
-                } else {
-                    $rule->setType($nameAndType);
-                }
+                list($type, $name) = explode(self::$TYPE_SEPARATOR, $beforeDefinition);
+                //$this->parsePreFilters($rule, $preFilters);
+                $rule->setName($name);
+                $rule->setType($type);
                 
             } else {
                 $rule->setName($beforeDefinition);
@@ -114,12 +108,7 @@ class StringRuleParser implements RuleParser
                 $rule->setDefinition($definition);
                 
                 // check for post filters
-                if (strpos($filters, self::$FILTER_SEPARATOR)) {
-                    $filters = explode(self::$FILTER_SEPARATOR, $filters);
-                    $this->processPostFilters($rule, $filters);
-                } else {
-                    $this->processPostFilters($rule, (array)$filters);
-                }
+                $this->parsePostFilters($rule, $filters);
                 
             } else {
                 $rule->setDefinition($afterDefinition);
@@ -145,14 +134,29 @@ class StringRuleParser implements RuleParser
         return implode(self::$FILTER_SEPARATOR, $serialized);
     }
     
-    private function processPreFilters($rule, $filters)
+    private function parseFilters($filters)
     {
-        
+        $filtersDefintions = explode(self::$FILTER_SEPARATOR, $filters);
+        $filters = [];
+        $parser = new StringFilterParser();
+        foreach ($filtersDefintions as $filterDefinition) {
+            $filters[] = $parser->parse($filterDefinition);
+        }
+        return $filters;
     }
     
-    private function processPostFilters($rule, $filters)
+    private function parsePreFilters($rule, $filters)
     {
+        if ($rule instanceof BasicRule) {
+            $rule->setPreFilters($this->parseFilters($filters));
+        }
+    }
     
+    private function parsePostFilters($rule, $filters)
+    {
+        if ($rule instanceof BasicRule) {
+            $rule->setPostFilters($this->parseFilters($filters));
+        }
     }
     
 }

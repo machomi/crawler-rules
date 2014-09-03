@@ -2,6 +2,6 @@
 namespace OW\Rules\Processor;
 
 
-class XpathRuleProcessor{
+class XpathRuleProcessor extends BaseRuleProcessor{
 
 }

@@ -26,9 +26,8 @@ abstract class BaseRuleProcessor implements RuleProcessor
      */
     public function evaluate(Rule $rule)
     {
-       
        foreach($rule->getPreFilters() as $preFilter) {
-           $preFilter->filter($rule);
+           $preFilter->filter($rule, $this->getCrawler());
        }
        
        $result = $this->doEvalute($rule->getDefinition());

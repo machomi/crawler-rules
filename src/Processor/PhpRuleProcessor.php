@@ -2,6 +2,6 @@
 namespace OW\Rules\Processor;
 
 
-class PhpRuleProcessor{
+class PhpRuleProcessor extends BaseRuleProcessor{
 
 }

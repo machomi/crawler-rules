@@ -4,7 +4,9 @@ namespace OW\Rules\Filter;
 class FilterManager
 {
 
-    private static $preFilters = [];
+    private static $preFilters = [
+        'modify' => 'OW\Rules\Filter\Pre\ModifyPreFilter'
+    ];
 
     private static $postFilters = [
         'strip_tags' => 'OW\Rules\Filter\Post\StripTagsPostFilter',
@@ -25,7 +27,7 @@ class FilterManager
         } elseif (isset(self::$preFilters[$alias])) {
             return self::$preFilters[$alias];
         } else {
-            throw \InvalidArgumentException('There is no registered filter for an alias '.$alias);
+            throw new \InvalidArgumentException('There is no registered filter for an alias '.$alias);
         }
     }
     
