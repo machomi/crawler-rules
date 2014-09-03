@@ -1,4 +1,7 @@
 /vendor/
 composer.phar
 composer.lock
+.settings
+.project
+.buildpath
 .DS_Store

@@ -11,7 +11,7 @@
 			"OW\\Rules\\Test\\" : "tests"
 		}
 	},
-	"name" : "OW/Crawler-Rules",
+	"name" : "ow/crawler-rules",
 	"license" : "MIT",
 	"type" : "library",
 	"description" : "Crawling rules processor",
